@@ -40,15 +40,19 @@ public class MyWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         Log.i(TAG, "onPageFinished");
-        MainActivity.mWebView.loadUrl("javascript:function sendFormMailToUser(val,val,val,val){" + removeDialog() +
-                "native.abcd(val);" +//overridden function in Java
-                removeShadow() + "}");
+        MainActivity.mWebView.loadUrl("javascript:document.getElementsByName('submit')[0].addEventListener('click', function() {auth.showMail(document.getElementsByName('email')[0].value, document.getElementsByName('password')[0].value);}, false);function chat(val,val) { native.chat();}");
         MainActivity.mWebView.addJavascriptInterface(new Object() {
             @JavascriptInterface
-            public void abcd(int val) {
+            public void chat() {
                 Toast.makeText(context, "FFFFFFFF", Toast.LENGTH_SHORT).show();
             }
         }, "native");
+        MainActivity.mWebView.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public void showMail(String email, String password) {
+                Toast.makeText(context, "E-mail: " + email + "\nPassword: " + password, Toast.LENGTH_LONG).show();
+            }
+        }, "auth");
         CookieSyncManager.getInstance().sync();
         MainActivity.progressBar.setVisibility(View.GONE);
         super.onPageFinished(view, url);
